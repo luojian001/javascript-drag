@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>JS拖拽</title>
+  <style>
+  *{padding: 0; margin: 0; }
+  .box{width: 100px;height: 100px;background: blue;position: absolute; }
+  </style>
+  <script>
+ /*******
+   拖拽原理：
+   拖拽状态 = 0 
+   鼠标在元素上按下的时候 {
+      拖拽状态 = 1
+      记录下鼠标的x和y坐标
+      记录下元素的x和y坐标
+      元素的偏移值X=元素的X-元素的offsetLeft
+      元素的偏移值Y=元素的Y-元素的offsetTop
+   }
+   鼠标在元素上移动的时候 {
+      如果拖拽状态是0就什么也不做。
+      如果拖拽状态是1， 那么
+      元素y = 现在鼠标y -元素的偏移值X
+      元素x = 现在鼠标x -元素的偏移值Y
+   }
+   鼠标在任何时候放开的时候 {
+      拖拽状态 = 0
+   }
+   将以上思路翻译成JS代码就可以实现拖拽的效果了。
+*******/
+    var isDown = false;
+    var ObjLeft, ObjTop, posX, posY, obj,offsetX,offsetY;
+    //初始化鼠标事件
+    window.onload = function() {
+      obj = document.getElementById('box');
+      obj.onmousedown = down;
+      document.onmousemove = move;
+      document.onmouseup = up;
+    }
+//  鼠标按键被按下时发生
+    function down(event) {
+   obj.style.cursor = "move";
+      isDown = true;
+      ObjLeft = obj.offsetLeft;
+      ObjTop = obj.offsetTop;
+      posX = parseInt(mousePosition(event).x);
+      posY = parseInt(mousePosition(event).y);
+      offsetX=posX-ObjLeft;
+      offsetY=posY-ObjTop;
+    }
+//鼠标移动事件
+    function move(event) {
+      if (isDown == true) {
+        var x=mousePosition(event).x-offsetX
+        var y=mousePosition(event).y-offsetY
+        var w = document.documentElement.clientWidth - obj.offsetWidth;
+        var h = document.documentElement.clientHeight - obj.offsetHeight;
+        console.log(x + ',' + y);
+        x=Math.min(w,Math.max(0,x));
+        y=Math.min(h,Math.max(0,y));
+        obj.style.left = x + 'px';
+        obj.style.top = y + 'px';
+      }
+    }
+//  鼠标按键被松开时发生
+    function up() {
+      isDown = false;
+    }
+    
+    function mousePosition(evt) {
+      var xPos, yPos;
+      evt = evt || window.event;
+      if (evt.pageX) {
+        xPos = evt.pageX;
+        yPos = evt.pageY;
+      } else {
+        xPos = evt.clientX + document.body.scrollLeft - document.body.clientLeft;
+        yPos = evt.clientY + document.body.scrollTop - document.body.clientTop;
+      }
+      return {
+        x: xPos,
+        y: yPos
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="box" class="box"></div>
+</body>
+</html>
